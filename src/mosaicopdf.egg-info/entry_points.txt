@@ -1,0 +1,2 @@
+[console_scripts]
+mosaicopdf = mosaicopdf.__main__:main

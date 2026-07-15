@@ -1,0 +1,341 @@
+# ADR-0001
+# Evolución de la arquitectura y alcance inicial de MosaicoPDF
+
+**Estado:** Aceptado
+
+**Fecha:** Julio de 2026
+
+---
+
+## Contexto
+
+MosaicoPDF nació como respuesta a una necesidad práctica: imprimir planos y documentos PDF de gran formato utilizando impresoras domésticas, sin perder la calidad vectorial del documento original.
+
+Durante la investigación se evaluaron diversas herramientas existentes, entre ellas:
+
+- pdfposter
+- LibreOffice Draw
+- Inkscape
+- herramientas comerciales de impresión de pósteres
+
+Aunque varias de ellas resolvían parcialmente el problema, ninguna ofrecía simultáneamente:
+
+- preservación completa del contenido vectorial;
+- independencia de programas específicos;
+- arquitectura abierta;
+- posibilidad de ampliación futura;
+- facilidad para integrarse con otros proyectos.
+
+Por este motivo se decidió desarrollar una herramienta propia.
+
+---
+
+# Primera idea
+
+Inicialmente se pensó en construir un programa relativamente completo desde el comienzo.
+
+Título:
+Motor de renderizado Beta
+
+Problema:
+PyMuPDF no permite generar un mosaico sin reescalar los tiles
+parciales.
+
+Decisión:
+La Beta utilizará Poppler para rasterizar el documento y Pillow
+para generar los tiles.
+
+Justificación:
+Se prioriza obtener una herramienta funcional para impresión real.
+
+Consecuencia:
+Se pierde temporalmente el formato vectorial.
+
+Estado:
+Aceptado.
+
+Las primeras ideas incluían:
+
+- interfaz gráfica;
+- perfiles de impresora;
+- solapes;
+- marcas de corte;
+- numeración;
+- instrucciones de ensamblaje;
+- múltiples formatos de papel.
+
+Conforme avanzó el diseño apareció un problema importante:
+
+El núcleo matemático aún no estaba validado.
+
+Agregar muchas funciones alrededor de un algoritmo no comprobado aumentaba la complejidad y dificultaba localizar errores.
+
+---
+
+# Cambio de enfoque
+
+Después de varias conversaciones se decidió invertir completamente la estrategia.
+
+En lugar de comenzar por la interfaz, se decidió construir primero el motor del programa.
+
+La arquitectura pasó a ser:
+
+PDF
+↓
+
+lector PDF
+↓
+
+cálculo del mosaico
+↓
+
+generación de hojas
+↓
+
+exportación PDF
+
+Todo lo demás quedó temporalmente fuera del alcance.
+
+---
+
+# Decisión principal
+
+La versión 1.0 tendría un único objetivo:
+
+**dividir correctamente un PDF en múltiples hojas.**
+
+Nada más.
+
+Esto implica dejar para versiones posteriores:
+
+- solapes;
+- marcas de corte;
+- numeración;
+- perfiles de impresora;
+- interfaz gráfica.
+
+---
+
+# Diseño modular
+
+Desde el principio se decidió separar claramente las responsabilidades.
+
+En lugar de un único archivo con cientos de líneas, se construyó una arquitectura basada en pequeños módulos.
+
+Actualmente los componentes principales son:
+
+- PDFReader
+- MosaicCalculator
+- PdfExporter
+- modelos
+
+Esta separación permitirá modificar el algoritmo sin afectar al resto del proyecto.
+
+---
+
+# Modelado del dominio
+
+En lugar de manejar únicamente números y listas, se decidió representar los conceptos reales mediante clases.
+
+Se crearon modelos para:
+
+Document
+
+Paper
+
+Tile
+
+Mosaic
+
+Posteriormente aparecieron también objetos de configuración.
+
+Esto permite que el código sea mucho más expresivo.
+
+---
+
+# Representación matricial
+
+Durante el diseño surgió una decisión importante.
+
+El mosaico podía almacenarse como:
+
+- lista lineal;
+- lista de listas;
+- matriz;
+- diccionario.
+
+Finalmente se decidió utilizar una representación matricial.
+
+Ejemplo:
+
+(0,0) (0,1) (0,2)
+
+(1,0) (1,1) (1,2)
+
+(2,0) (2,1) (2,2)
+
+Esta representación coincide con la forma natural de visualizar un mosaico y simplifica muchos cálculos posteriores.
+
+---
+
+# Coordenadas
+
+Cada Tile almacena:
+
+fila
+
+columna
+
+posición X
+
+posición Y
+
+ancho
+
+alto
+
+No se almacena únicamente un índice.
+
+Esto facilita futuras operaciones como:
+
+- solapes;
+- márgenes;
+- escalado;
+- ensamblaje.
+
+---
+
+# Salida por terminal
+
+Durante el desarrollo apareció otra idea.
+
+Aunque la versión inicial funcionará únicamente desde línea de comandos, la salida puede ser amigable.
+
+Se decidió que el programa mostrará:
+
+información del documento
+
+tamaño del papel
+
+número de filas
+
+número de columnas
+
+diagrama ASCII del mosaico
+
+Esta salida servirá como primera validación visual del algoritmo.
+
+---
+
+# JSON de ensamblaje
+
+Inicialmente se pensó generar un archivo TXT.
+
+Después se concluyó que un JSON ofrece muchas más posibilidades.
+
+El JSON permitirá que futuras aplicaciones puedan:
+
+mostrar el mosaico
+
+crear asistentes gráficos
+
+realizar ensamblaje automático
+
+integrarse con otros programas
+
+---
+
+# Escalado del documento
+
+Originalmente el programa únicamente dividiría el PDF.
+
+Posteriormente apareció una necesidad importante.
+
+Muchos usuarios necesitan imprimir un plano al 90 %, 75 %, 50 %, etc.
+
+Por ello se decidió que la versión 2 incorporará un paso previo:
+
+PDF original
+
+↓
+
+escalado
+
+↓
+
+cálculo del mosaico
+
+↓
+
+exportación
+
+De esta manera todo el algoritmo continuará funcionando sobre el documento ya escalado.
+
+---
+
+# Filosofía del proyecto
+
+Durante las conversaciones se consolidó una serie de principios.
+
+MosaicoPDF debe ser:
+
+- libre;
+- modular;
+- mantenible;
+- matemáticamente correcto;
+- independiente de la interfaz gráfica;
+- orientado a preservar el contenido vectorial;
+- fácilmente extensible.
+
+---
+
+# Estado actual
+
+Actualmente el proyecto dispone de:
+
+estructura Python moderna;
+
+paquete instalable;
+
+primeros modelos del dominio;
+
+lector PDF funcional;
+
+cálculo básico del mosaico;
+
+primer exportador PDF;
+
+primeras pruebas unitarias;
+
+documentación inicial.
+
+El esfuerzo actual está concentrado en validar completamente el algoritmo antes de añadir nuevas funcionalidades.
+
+---
+
+# Consecuencias
+
+La versión 1 llegará antes y será mucho más robusta.
+
+Las futuras versiones podrán incorporar nuevas funciones sin modificar el núcleo matemático.
+
+El proyecto mantiene una arquitectura sencilla, limpia y preparada para crecer durante muchos años.
+
+ADR-001
+Fecha: 2026-07-13
+
+Problema
+PyMuPDF.show_pdf_page() reescala automáticamente el contenido del parámetro
+clip para ajustarlo al rectángulo destino.
+
+Evidencia
+Se realizaron pruebas con mosaicos 2x3 y 2x4.
+La última columna siempre aparece ampliada.
+Modificar el rectángulo destino no elimina el problema.
+
+Decisión
+Se descarta definitivamente show_pdf_page() como motor de renderizado
+de MosaicoPDF.
+
+Consecuencia
+Se desarrollará un motor de exportación alternativo.

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "mosaicopdf"
+version = "1.0.0"
+description = "Herramienta libre para dividir documentos PDF en mosaico."
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = ["PyMuPDF>=1.28"]
+
+authors = [{ name = "Fabián España" }]
+
+license = { text = "MIT" }
+
+
+[project.scripts]
+mosaicopdf = "mosaicopdf.__main__:main"
+
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
