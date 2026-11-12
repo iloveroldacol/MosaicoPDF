@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>MosaicoPDF 2.0 (Dividir y Escalar)</name>
+  <id>org.mosaicopdf.export.v2</id>
+
+  <param name="tab" type="notebook">
+    <page name="layout" gui-text="Papel y Escala">
+      <param name="paper" type="optiongroup" appearance="combo" gui-text="Papel de impresion:">
+        <option value="carta">Carta (215.9 x 279.4 mm)</option>
+        <option value="oficio">Oficio (215.9 x 330.2 mm)</option>
+        <option value="a4">A4 (210 x 297 mm)</option>
+        <option value="a3">A3 (297 x 420 mm)</option>
+        <option value="tabloide">Tabloide (279.4 x 431.8 mm)</option>
+      </param>
+      <param name="orientation" type="optiongroup" appearance="combo" gui-text="Orientacion:">
+        <option value="auto">Automatica (menos hojas)</option>
+        <option value="portrait">Vertical</option>
+        <option value="landscape">Horizontal</option>
+      </param>
+      <param name="scale_mode" type="optiongroup" appearance="combo" gui-text="Modo de escala:">
+        <option value="original">1:1 Tamano original</option>
+        <option value="factor">Porcentaje (ej. 200%)</option>
+        <option value="target_size">Escalar a gran formato (ej. A0 o 1500x1000mm)</option>
+        <option value="grid">Ajustar a cuadricula mural (COLxFIL)</option>
+      </param>
+      <param name="scale_value" type="string" gui-text="Valor de escala / formato / cuadricula:">100%</param>
+      <param name="alignment" type="optiongroup" appearance="combo" gui-text="Alineacion en hojas:">
+        <option value="top-left">Esquina superior izquierda</option>
+        <option value="center">Centrado (recomendado murales)</option>
+      </param>
+    </page>
+
+    <page name="guides" gui-text="Margenes, Solapas y Guias">
+      <param name="margin_mm" type="float" min="0.0" max="50.0" precision="1" gui-text="Margen de impresora (mm):">5.0</param>
+      <param name="overlap_mm" type="float" min="0.0" max="50.0" precision="1" gui-text="Solapa de pegado (mm):">12.0</param>
+      <param name="traversal" type="optiongroup" appearance="combo" gui-text="Orden de impresion:">
+        <option value="row-major">Por filas (A1, A2, B1...)</option>
+        <option value="col-major">Por columnas (A1, B1, A2...)</option>
+        <option value="snake">Serpentina / zig-zag</option>
+      </param>
+      <param name="cut_marks" type="bool" gui-text="Incluir marcas de corte">true</param>
+      <param name="assembly_guides" type="bool" gui-text="Incluir guias de armado con pieza vecina">true</param>
+      <param name="cover_map" type="bool" gui-text="Agregar pagina inicial con mapa de ensamblaje">true</param>
+    </page>
+
+    <page name="output" gui-text="Salida">
+      <param name="output_dir" type="path" mode="folder" gui-text="Carpeta de salida (vacio = junto al SVG o Escritorio):"></param>
+      <param name="export_json" type="bool" gui-text="Exportar tambien JSON de ensamblaje">false</param>
+    </page>
+  </param>
+
+  <effect needs-live-preview="false">
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu name="Exportar"/>
+    </effects-menu>
+  </effect>
+
+  <script>
+    <command location="inx" interpreter="python">mosaicopdf_inkscape.py</command>
+  </script>
+</inkscape-extension>

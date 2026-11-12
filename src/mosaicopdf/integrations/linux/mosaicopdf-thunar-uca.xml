@@ -1,0 +1,9 @@
+<!-- Acción personalizada para XFCE Thunar (~/.config/Thunar/uca.xml) -->
+<action>
+  <icon>document-print</icon>
+  <name>Abrir en MosaicoPDF 2.0</name>
+  <command>__RIGHTCLICK_BIN__ %f</command>
+  <description>Dividir o escalar PDF en mosaico vectorial con guias de armado</description>
+  <patterns>*.pdf;*.PDF</patterns>
+  <other-files/>
+</action>
